@@ -2,6 +2,9 @@
 
 > **Interactive Portfolio Demonstration Edition**  
 > Plataforma de alta fidelidade e performance para organização centralizada de marcadores, telemetria e atalhos operacionais com design **Apple Liquid Glassmorphism**, 34 Shaders WebGL procedurais e sincronização Supabase Realtime.
+> 
+> 🌐 **Live Demo Oficial**: [https://mcpos-demo.vercel.app](https://mcpos-demo.vercel.app)  
+> 🔗 **Espelho Alternativo**: [https://m-c-p-os-demo.vercel.app](https://m-c-p-os-demo.vercel.app)
 
 ---
 

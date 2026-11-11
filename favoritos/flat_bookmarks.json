@@ -1,0 +1,16 @@
+{
+  "Barra de favoritos": [
+    { "name": "Google", "url": "https://www.google.com" },
+    { "name": "GitHub", "url": "https://github.com" },
+    { "name": "Vercel", "url": "https://vercel.com" },
+    { "name": "Supabase", "url": "https://supabase.com" },
+    { "name": "Figma", "url": "https://figma.com" },
+    { "name": "Linear", "url": "https://linear.app" },
+    { "name": "Stripe", "url": "https://stripe.com" },
+    { "name": "Raycast", "url": "https://raycast.com" },
+    { "name": "Postman", "url": "https://www.postman.com" },
+    { "name": "Tailwind CSS", "url": "https://tailwindcss.com" },
+    { "name": "Next.js", "url": "https://nextjs.org" },
+    { "name": "OpenAI", "url": "https://openai.com" }
+  ]
+}

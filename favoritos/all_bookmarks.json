@@ -1,0 +1,20 @@
+{
+  "checksum": "demo-clean-mcp-os",
+  "roots": {
+    "bookmark_bar": {
+      "children": [
+        { "name": "Google", "type": "url", "url": "https://www.google.com" },
+        { "name": "GitHub", "type": "url", "url": "https://github.com" },
+        { "name": "Vercel", "type": "url", "url": "https://vercel.com" },
+        { "name": "Supabase", "type": "url", "url": "https://supabase.com" },
+        { "name": "Figma", "type": "url", "url": "https://figma.com" },
+        { "name": "Linear", "type": "url", "url": "https://linear.app" },
+        { "name": "Stripe", "type": "url", "url": "https://stripe.com" },
+        { "name": "Raycast", "type": "url", "url": "https://raycast.com" }
+      ],
+      "name": "Barra de favoritos",
+      "type": "folder"
+    }
+  },
+  "version": 1
+}

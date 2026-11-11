@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="is-authenticated">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="MCP OS [DEMO] — Liquid Glass Web OS Dashboard & Bookmarks Manager Showcase">
+  <meta name="theme-color" content="#08080c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>MCP OS — Demo Showcase</title>
+  <link rel="stylesheet" href="css/style.css?v=20261110_demo_experience">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    (function() {
+      try {
+        // Inicializa sessão de demonstração imediata
+        document.documentElement.classList.add('is-authenticated');
+        if (!sessionStorage.getItem('mcp_admin_email')) {
+          sessionStorage.setItem('mcp_admin_email', 'demo@mcpos.dev');
+          sessionStorage.setItem('mcp_admin_session', 'mcp_demo_token_active');
+        }
+      } catch(e) {}
+    })();
+  </script>
+</head>
+<body class="demo-ready">
+
+  <!-- DEMO BOOT SCREEN (Abertura Suave Premium & Revelação Animada) -->
+  <div id="demo-boot-screen" class="demo-boot-screen">
+    <div class="demo-boot-content">
+      <div class="demo-boot-badge">
+        <span class="demo-boot-icon">⚡</span>
+      </div>
+      <h1 class="demo-boot-title">MCP OS</h1>
+      <p class="demo-boot-tagline">PORTFOLIO DEMO SHOWCASE</p>
+
+      <div class="demo-boot-loader-box">
+        <div class="demo-boot-bar-track">
+          <div class="demo-boot-bar-fill"></div>
+        </div>
+        <span class="demo-boot-status-text">Inicializando interface Liquid Glass...</span>
+      </div>
+
+      <div class="demo-boot-features">
+        <span class="demo-chip">✨ Liquid Glassmorphism</span>
+        <span class="demo-chip">🔮 34 WebGL Shaders</span>
+        <span class="demo-chip">⚡ Realtime Ready</span>
+      </div>
+
+      <button type="button" id="demo-skip-btn" class="demo-skip-btn">
+        Entrar no Sistema ➔
+      </button>
+    </div>
+  </div>
+
+  <!-- Mandatory System Lock Screen (ROOT LOGIN Style) -->
+  <div id="system-lock-overlay" class="system-lock-overlay unlocked" style="display: none; pointer-events: none;">
+    <div class="lock-backdrop"></div>
+
+    <div class="lock-card">
+      <div class="lock-header">
+        <h1 class="root-login-title">ROOT LOGIN</h1>
+        <p class="root-login-sub">PAINEL ADMINISTRATIVO • DEMO</p>
+      </div>
+
+      <form id="system-lock-form">
+        <div class="setting-group" style="margin-top: 20px;">
+          <label class="lock-field-label">EMAIL</label>
+          <input type="email" id="lock-email-input" class="root-login-input" value="demo@mcpos.dev" required placeholder="demo@mcpos.dev" autocomplete="off">
+        </div>
+        <div class="setting-group" style="margin-top: 16px;">
+          <label class="lock-field-label">SENHA</label>
+          <input type="password" id="lock-password-input" class="root-login-input" value="demo123" required placeholder="••••••••••••" autocomplete="new-password">
+        </div>
+        <div id="lock-msg" class="admin-msg" style="display: none; margin-top: 14px;"></div>
+        <button type="submit" id="btn-lock-submit" class="root-login-btn" style="margin-top: 24px; width: 100%;">
+          AUTENTICAR
+        </button>
+        <button type="button" id="btn-lock-demo-quick" class="root-login-btn-demo" style="margin-top: 10px; width: 100%; padding: 10px; background: rgba(167, 139, 250, 0.15); border: 1px solid rgba(167, 139, 250, 0.35); color: #c4b5fd; border-radius: 10px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+          ⚡ Entrar no Modo Demo (1 Clique)
+        </button>
+      </form>
+
+      <div class="lock-footer-note" style="margin-top: 20px; font-size: 0.72rem; color: rgba(255,255,255,0.5); text-align: center; font-family: monospace; letter-spacing: 1px;">
+        🛡️ AMBIENTE DE DEMONSTRAÇÃO • SUPABASE REALTIME & LIQUID GLASS
+      </div>
+    </div>
+  </div>
+
+  <!-- Background Slideshow -->
+  <div id="bg-container">
+    <div class="bg-slide" id="bg-slide-1"></div>
+    <div class="bg-slide" id="bg-slide-2"></div>
+    <video id="bg-video-1" class="bg-video-layer" muted playsinline></video>
+    <video id="bg-video-2" class="bg-video-layer" muted playsinline></video>
+    <div id="bg-webgl-container"></div>
+  </div>
+  <div id="bg-overlay"></div>
+
+  <!-- (left-vertical-dock removida — super atalhos migrados para #bottom-os-dock) -->
+
+  <!-- MAIN DESKTOP OS WINDOW -->
+  <div id="desktop-window">
+    <div id="desktop-window-inner">
+      
+      <!-- LEFT PANEL (Widgets Hub) -->
+      <div id="desktop-left-sidebar">
+        <!-- Clock & Date -->
+        <div id="clock-area">
+          <div id="clock">00:00</div>
+          <div id="date-display">Carregando data...</div>
+        </div>
+
+        <!-- Month Calendar Widget -->
+        <div id="calendar-widget" title="Calendário Interativo do Sistema">
+          <div id="calendar-header">
+            <span id="calendar-month-year">Janeiro 2026</span>
+          </div>
+          <div id="calendar-weekdays">
+            <span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
+          </div>
+          <div id="calendar-days">
+            <!-- Dynamically populated by JS -->
+          </div>
+        </div>
+
+        <!-- Moon Phase Widget -->
+        <div id="moon-phase-widget">
+          <div class="moon-row">
+            <span class="moon-icon" id="moon-icon">🌑</span>
+            <div class="moon-text">
+              <span class="moon-title">Fase da Lua</span>
+              <span class="moon-desc" id="moon-desc">Calculando...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Season / Época do Ano Widget -->
+        <div id="season-widget" class="season-widget">
+          <div class="season-row">
+            <span class="season-icon" id="season-icon">❄️</span>
+            <div class="season-text">
+              <div class="season-header-row">
+                <span class="season-title" id="season-title">Carregando...</span>
+                <span class="season-badge" id="season-percentage">--% Restante</span>
+              </div>
+              <span class="season-desc" id="season-desc">Calculando estação...</span>
+            </div>
+          </div>
+          <div class="season-progress-bar">
+            <div class="season-progress-fill" id="season-progress-fill"></div>
+          </div>
+        </div>
+
+        <!-- Weather Widget (Sete Lagoas MG) -->
+        <div class="weather-widget" id="weather-widget">
+          <div class="weather-info">
+            <span class="weather-city">Sete Lagoas, MG</span>
+            <div class="weather-temp-row">
+              <span class="weather-temp" id="weather-temp">--°C</span>
+              <span class="weather-desc" id="weather-desc">Carregando...</span>
+            </div>
+          </div>
+          <div class="weather-details">
+            <span class="weather-detail-item">Umidade: <strong id="weather-humidity">--%</strong></span>
+            <span class="weather-detail-item">Qualidade Ar: <strong id="weather-aqi">--</strong></span>
+          </div>
+        </div>
+
+        <!-- Music Player Widget -->
+        <div class="music-player-widget" id="music-player-widget">
+          <div class="music-disc">
+            <div class="music-disc-center"></div>
+          </div>
+          <div class="music-widget-text">
+            <span class="music-widget-title">Tocador de Música</span>
+            <span class="music-widget-subtitle">iBroadcast & Binaural</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL (Dynamic Apps Container) -->
+      <div id="desktop-right-content">
+        <!-- Search Area with Smart Autocomplete -->
+        <div id="search-area">
+          <form class="search-container" id="search-form" action="https://www.google.com/search" method="GET" target="_self">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+            </svg>
+            <input type="text" id="search-input" name="q" placeholder="Pesquisar ou digite '/' para comandos..." autocomplete="off" spellcheck="false" autofocus>
+            <div class="search-buttons">
+              <button type="submit" class="search-btn" id="btn-search">Search</button>
+              <button type="button" class="search-btn" id="btn-images">Images</button>
+            </div>
+          </form>
+          <!-- Suggestions Dropdown -->
+          <div id="search-suggestions"></div>
+        </div>
+
+        <!-- App Folder Header -->
+        <div id="app-folder-header">
+          <span id="active-folder-icon">🔍</span>
+          <h2 id="active-folder-name">Developer Tools</h2>
+        </div>
+
+        <!-- App Folder Grid View -->
+        <div id="active-folder-grid">
+          <!-- Dynamically populated by JS based on selection -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BARRA ÚNICA UNIFICADA (Pastas + Super Atalhos) -->
+  <div id="bottom-os-dock">
+    <!-- Pastas de Apps -->
+    <button class="dock-folder-btn active" data-folder="tools" title="Developer Tools">
+      <span style="font-size: 1.45rem;">🛠️</span>
+    </button>
+    <button class="dock-folder-btn" data-folder="server" title="Cloud & Server">
+      <span style="font-size: 1.45rem;">🖥️</span>
+    </button>
+    <button class="dock-folder-btn" data-folder="discord" title="Discord Space">
+      <img src="https://www.google.com/s2/favicons?domain=discord.com&sz=64" alt="Discord">
+    </button>
+    <button class="dock-folder-btn" data-folder="proton" title="Privacy & Security">
+      <img src="https://www.google.com/s2/favicons?domain=proton.me&sz=64" alt="Proton">
+    </button>
+    <button class="dock-folder-btn" data-folder="social" title="Social & Growth">
+      <span style="font-size: 1.45rem;">👥</span>
+    </button>
+    <div class="dock-separator"></div>
+    <button id="settings-btn" title="Configurações">⚙️</button>
+
+    <!-- Separador visual -->
+    <div class="dock-separator dock-separator-quick"></div>
+
+    <!-- Super Atalhos (migrados da barra esquerda) -->
+    <!-- Google Smart Shortcuts Wrapper -->
+    <div class="dock-item-wrapper">
+      <button class="dock-item" id="google-dock-trigger" title="Google Options">
+        <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="Google">
+      </button>
+      <div id="google-liquid-menu" class="liquid-menu liquid-menu-up">
+        <a href="https://www.google.com/?hl=pt_BR" target="_blank" rel="noopener">Google Search</a>
+        <a href="https://gemini.google.com/app?hl=pt-PT" target="_blank" rel="noopener">Gemini</a>
+        <a href="https://notebooklm.google.com/" target="_blank" rel="noopener">NotebookLM</a>
+        <a href="https://aistudio.google.com/apps" target="_blank" rel="noopener">AI Studio</a>
+        <a href="https://labs.google/fx/tools/flow" target="_blank" rel="noopener">Flow</a>
+        <a href="https://one.google.com" target="_blank" rel="noopener">Google One</a>
+        <a href="https://mail.google.com" target="_blank" rel="noopener">Gmail</a>
+        <a href="https://calendar.google.com" target="_blank" rel="noopener">Google Agenda</a>
+        <a href="https://ads.google.com" target="_blank" rel="noopener">Google Ads</a>
+        <a href="https://drive.google.com/drive/my-drive" target="_blank" rel="noopener">Drive</a>
+        <a href="https://photos.google.com/" target="_blank" rel="noopener">Photos</a>
+        <a href="https://chromewebstore.google.com/" target="_blank" rel="noopener">Chrome Web Store</a>
+      </div>
+    </div>
+
+    <!-- YouTube Smart Shortcuts Wrapper -->
+    <div class="dock-item-wrapper">
+      <button class="dock-item" id="youtube-dock-trigger" title="YouTube Options">
+        <img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=64" alt="YouTube">
+      </button>
+      <div id="youtube-liquid-menu" class="liquid-menu liquid-menu-up">
+        <a href="https://www.youtube.com/" target="_blank" rel="noopener">YouTube Home</a>
+        <a href="https://www.youtube.com/feed/playlists" target="_blank" rel="noopener">Playlists</a>
+        <a href="https://music.youtube.com/" target="_blank" rel="noopener">YouTube Music</a>
+        <a href="https://www.youtube.com/playlist?list=WL" target="_blank" rel="noopener">Assistir mais tarde</a>
+        <a href="https://www.youtube.com/feed/history" target="_blank" rel="noopener">Histórico</a>
+      </div>
+    </div>
+
+    <!-- 3D Sphere Smart Shortcuts Wrapper -->
+    <div class="dock-item-wrapper">
+      <button class="dock-item sphere-dock-item" id="sphere-dock-trigger" title="Central de Aplicações MCP">
+        <span class="sphere-icon-3d"></span>
+      </button>
+      <div id="sphere-liquid-menu" class="liquid-menu liquid-menu-up">
+        <a href="https://github.com/MateusCelestinoProX" target="_blank" rel="noopener">⚡ GitHub Profile</a>
+        <a href="https://linear.app" target="_blank" rel="noopener">📐 Linear Workspace</a>
+        <a href="https://supabase.com" target="_blank" rel="noopener">🗄️ Supabase Cloud</a>
+        <a href="https://vercel.com" target="_blank" rel="noopener">▲ Vercel Platform</a>
+        <a href="https://figma.com" target="_blank" rel="noopener">🎨 Figma Design Lab</a>
+        <a href="https://openai.com" target="_blank" rel="noopener">🤖 OpenAI Studio</a>
+        <a href="https://stripe.com" target="_blank" rel="noopener">💳 Stripe Payments</a>
+        <a href="https://raycast.com" target="_blank" rel="noopener">🚀 Raycast Hub</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Music Option Modal -->
+  <div id="music-modal">
+    <div class="modal-backdrop" id="music-backdrop"></div>
+    <div class="modal-panel">
+      <button class="modal-close" id="music-close">✕</button>
+      <h2>🎵 Central de Música</h2>
+      <div class="setting-group">
+        <label class="setting-label">Escolha onde quer ouvir:</label>
+        <div class="music-options">
+          <button class="music-option-btn" id="open-ibroadcast">Abrir iBroadcast</button>
+          <button class="music-option-btn" id="open-binaural">Abrir Binaural Pro</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10-Hour Mandatory Pop-up (Mensagem de Propósito) -->
+  <div id="mandatory-popup">
+    <!-- Slider for the background images -->
+    <div id="mandatory-bg-slider"></div>
+    
+    <div class="modal-backdrop" id="mandatory-backdrop" style="background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);"></div>
+    <div class="modal-panel alert-panel-mandatory" style="position: relative; z-index: 2003;">
+      <h3 style="color: var(--accent-primary); font-family: 'Outfit'; font-size: 1rem; margin-bottom: 8px;">✨ MCP OS • Experiência Demonstração</h3>
+      <p class="alert-message" style="margin-bottom: 0px; font-size: 0.85rem; line-height: 1.4; color: rgba(255,255,255,0.9);">
+        Sistema operacional web para produtividade de alta performance com interface Liquid Glass, aceleração WebGL e sincronização contínua.
+      </p>
+    </div>
+  </div>
+      </p>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal">
+    <div class="modal-backdrop" id="settings-backdrop"></div>
+    <div class="modal-panel">
+      <button class="modal-close" id="settings-close">✕</button>
+      <h2>⚙️ Configurações</h2>
+      <div class="setting-group">
+        <label class="setting-label">Galeria de Background</label>
+        <select class="setting-select" id="gallery-select">
+          <option value="random">🎲 Aleatório (Sorteio a cada reload)</option>
+          <option value="gym">🏋️ GYM Images</option>
+          <option value="flowers">🌸 Flowers</option>
+          <option value="red">🔴 Red</option>
+          <option value="soft">💿 Gen X Soft Club</option>
+          <option value="motivation">💪 Motivacional</option>
+          <option value="video">🌐 Cinematic Video (API)</option>
+          <option value="api">🌐 API Background (Random)</option>
+          <optgroup label="✨ React Bits Animated (Code Shaders)">
+            <option value="galaxybits">✨ Todos os React Bits (Rotativo Code Shaders)</option>
+            <option value="softaurora">🌌 Soft Aurora</option>
+            <option value="particles">✨ 3D Particles</option>
+            <option value="ghostfibers">🌀 Ghost Fibers</option>
+            <option value="plasmawave">🌊 Plasma Wave</option>
+            <option value="strands">🌟 Light Strands</option>
+            <option value="siderays">⚡ Side Rays</option>
+            <option value="beams">🔦 Volumetric Beams</option>
+            <option value="floatinglines">〰️ Floating Lines</option>
+            <option value="silk">🧣 Liquid Silk</option>
+            <option value="radar">🎯 Tactical Radar</option>
+            <option value="ripplegrid">🌐 Ripple Grid</option>
+            <option value="pixelblast">💥 Pixel Blast</option>
+            <option value="magicrings">💫 Magic Rings</option>
+            <option value="gridscan">📡 Grid Scan</option>
+            <option value="liquidchrome">🪙 Liquid Chrome</option>
+            <option value="linewaves">🌊 Line Waves</option>
+            <option value="ferrofluid">🧲 Ferrofluid</option>
+            <option value="dither">👾 Dither Matrix</option>
+            <option value="darkveil">🌑 Dark Veil</option>
+            <option value="webthreads">🕸️ Web Threads</option>
+            <option value="topography">🗺️ Topography</option>
+            <option value="balatro">🃏 Balatro Flow</option>
+            <option value="faultyterminal">📟 Faulty Terminal</option>
+            <option value="morphslider">🎞️ Morph Slider</option>
+            <option value="antigravity">🛸 Antigravity</option>
+            <option value="aurora">🌠 Northern Aurora</option>
+            <option value="letterglitch">🔤 Letter Glitch</option>
+            <option value="plasma">⚡ Electric Plasma</option>
+            <option value="liquidether">💧 Liquid Ether</option>
+            <option value="orb">🔮 Energy Orb</option>
+            <option value="prism">💎 Prismatic Beam</option>
+            <option value="prismaticburst">🎆 Prismatic Burst</option>
+            <option value="lightning">⚡ Thunder Lightning</option>
+            <option value="evileye">👁️ Evil Eye</option>
+            <option value="lighttunnel">🚀 Light Tunnel</option>
+            <option value="ancidsquares">🟩 Acid Squares</option>
+            <option value="moltenmetal">🌋 Molten Metal</option>
+          </optgroup>
+        </select>
+        <button type="button" id="randomize-bg-btn" style="margin-top: 10px; width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: #fff; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">🔀 Sortear Novo Background Agora</button>
+      </div>
+      <div class="setting-group" style="margin-top: 14px;">
+        <label class="setting-label" id="speed-label">⏱️ Tempo de Troca: <span id="speed-val-display" style="color: var(--accent-primary); font-weight: 700;">10</span>s (5s até 200s)</label>
+        <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+          <span style="font-size: 0.75rem; color: var(--text-tertiary);">5s</span>
+          <input type="range" id="custom-speed-slider" min="5" max="200" value="10" step="1" style="flex: 1; accent-color: var(--accent-primary); cursor: pointer;">
+          <span style="font-size: 0.75rem; color: var(--text-tertiary);">200s</span>
+        </div>
+      </div>
+      <div class="setting-group" style="margin-top: 18px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px;">
+        <label class="setting-label">Administração do Sistema</label>
+        <button type="button" id="admin-panel-btn" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(167, 139, 250, 0.4); background: rgba(167, 139, 250, 0.15); color: #a78bfa; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease;">
+          🔐 Painel Administrativo MCP
+        </button>
+      </div>
+      <div class="setting-group" style="margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px;">
+        <label class="setting-label">Sincronização entre dispositivos</label>
+        <button type="button" id="force-sync-btn" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(52, 211, 153, 0.45); background: rgba(52, 211, 153, 0.15); color: #34d399; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease;">
+          🔄 Forçar Sincronização Agora
+        </button>
+        <p style="font-size: 0.72rem; color: var(--text-tertiary); margin-top: 8px; line-height: 1.4;">Puxa o estado mais recente do servidor e limpa dados antigos em cache neste aparelho. Use se algo não atualizou no celular.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Panel Modal -->
+  <div id="admin-modal" class="admin-modal-container">
+    <div class="modal-backdrop" id="admin-backdrop"></div>
+    <div class="modal-panel admin-modal-panel">
+      <button class="modal-close" id="admin-close">✕</button>
+      
+      <!-- Dashboard View (Acesso Direto Unificado) -->
+      <div id="admin-dashboard-view" class="admin-view">
+        <!-- Premium Liquid Glass Header -->
+        <div class="admin-dash-header">
+          <div class="admin-header-brand">
+            <div class="admin-brand-icon">⚡</div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="admin-dash-h2">Painel Administrativo MCP</h2>
+                <span class="admin-status-pill">
+                  <span class="status-dot"></span> Realtime Conectado
+                </span>
+              </div>
+              <p class="admin-brand-sub">Gerenciamento central de marcadores, sub-atalhos e wallpapers sincronizados cross-device.</p>
+            </div>
+          </div>
+          <div class="admin-header-actions">
+            <button type="button" id="btn-admin-logout" class="admin-logout-btn">
+              <span>🔒</span> Sair da Conta
+            </button>
+          </div>
+        </div>
+
+        <!-- Apple Liquid Glass Segmented Navigation Tabs -->
+        <div class="admin-tabs-wrapper">
+          <button type="button" class="admin-tab-btn active" id="tab-btn-shortcuts" data-tab="tab-shortcuts">
+            <span class="tab-icon">📁</span>
+            <span class="tab-label">Marcadores (Icons)</span>
+          </button>
+          <button type="button" class="admin-tab-btn" id="tab-btn-subshortcuts" data-tab="tab-subshortcuts">
+            <span class="tab-icon">⚡</span>
+            <span class="tab-label">Super Ícones (Sub-menus)</span>
+          </button>
+          <button type="button" class="admin-tab-btn" id="tab-btn-bg-gallery" data-tab="tab-bg-gallery">
+            <span class="tab-icon">🖼️</span>
+            <span class="tab-label">Wallpapers Customizados</span>
+          </button>
+        </div>
+
+        <!-- Tab 1: System Shortcuts Management -->
+        <div id="tab-shortcuts" class="admin-tab-content active">
+          <div class="admin-grid-2col">
+            
+            <!-- Left Column: Add / Edit Shortcut Studio -->
+            <div class="admin-card-box studio-box">
+              <div class="box-header-row">
+                <div class="flex items-center gap-2">
+                  <span class="studio-icon-badge">➕</span>
+                  <div>
+                    <h3 class="admin-box-title" id="shortcut-form-title">Criar Novo Atalho</h3>
+                    <p class="admin-box-sub">Adiciona um novo ícone à pasta escolhida.</p>
+                  </div>
+                </div>
+                <button type="button" id="btn-cancel-edit-shortcut" class="btn-cancel-edit" style="display: none;">
+                  ✕ Cancelar
+                </button>
+              </div>
+              
+              <form id="form-add-shortcut" class="admin-form-stacked">
+                <div class="admin-form-scrollable">
+                  <div class="form-group">
+                    <label class="setting-label">Pasta / Categoria de Destino</label>
+                    <select id="shortcut-folder-select" class="admin-select">
+                      <option value="tools">🛠️ Tools</option>
+                      <option value="server">🖥️ Server</option>
+                      <option value="discord">💬 Discord Space</option>
+                      <option value="proton">⚛️ Proton Space</option>
+                      <option value="social">👥 Social Media</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="setting-label">Nome do Atalho</label>
+                    <input type="text" id="shortcut-name-input" class="admin-input" required placeholder="Ex: Pinterest, Figma, Vercel, Supabase...">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="setting-label">URL de Destino</label>
+                    <input type="url" id="shortcut-url-input" class="admin-input" required placeholder="https://exemplo.com">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="setting-label">Descrição Curta (Opcional)</label>
+                    <input type="text" id="shortcut-desc-input" class="admin-input" placeholder="Ex: Galeria de inspiração visual">
+                  </div>
+                  
+                  <!-- Icon Custom Slot with Live Preview -->
+                  <div class="form-icon-slot">
+                    <div class="slot-header-flex">
+                      <span class="slot-label">🎨 Ícone / Favicon Personalizado</span>
+                      <div id="shortcut-icon-preview" class="icon-live-preview">🔗</div>
+                    </div>
+                    <div class="slot-inputs">
+                      <div class="form-group" style="margin-bottom: 8px;">
+                        <label class="setting-label-sm">URL da Imagem / Favicon</label>
+                        <input type="url" id="shortcut-icon-url" class="admin-input" placeholder="https://exemplo.com/icon.png">
+                      </div>
+                      <div class="form-group">
+                        <label class="setting-label-sm">Ou Upload Direto de Imagem</label>
+                        <input type="file" id="shortcut-icon-file" class="admin-input-file" accept="image/*">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="admin-form-sticky-footer">
+                  <button type="submit" id="btn-submit-shortcut" class="admin-btn-primary-action">
+                    <span>➕ Adicionar Atalho no Supabase</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Right Column: Shortcuts Management List -->
+            <div class="admin-card-box list-box">
+              <div class="list-header-flex">
+                <div>
+                  <h3 class="admin-box-title">📋 Atalhos Registrados</h3>
+                  <span class="admin-box-sub">Filtre por pasta ou pesquise em tempo real</span>
+                </div>
+                <div class="list-search-wrapper">
+                  <input type="text" id="admin-search-shortcuts" class="admin-search-input" placeholder="🔍 Buscar atalhos...">
+                </div>
+              </div>
+
+              <!-- Apple Segmented Control Bar -->
+              <div id="shortcuts-segmented-bar" class="apple-segmented-bar">
+                <button type="button" class="apple-pill active" data-folder="tools">🛠️ Tools <span class="pill-badge" id="badge-count-tools">0</span></button>
+                <button type="button" class="apple-pill" data-folder="server">🖥️ Server <span class="pill-badge" id="badge-count-server">0</span></button>
+                <button type="button" class="apple-pill" data-folder="discord">💬 Discord <span class="pill-badge" id="badge-count-discord">0</span></button>
+                <button type="button" class="apple-pill" data-folder="proton">⚛️ Proton <span class="pill-badge" id="badge-count-proton">0</span></button>
+                <button type="button" class="apple-pill" data-folder="social">👥 Social <span class="pill-badge" id="badge-count-social">0</span></button>
+              </div>
+
+              <div id="admin-shortcuts-list" class="admin-scroll-list apple-list-container">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Tab 2: Super Icons Sub-shortcuts Management -->
+        <div id="tab-subshortcuts" class="admin-tab-content" style="display: none;">
+          <div class="admin-grid-2col">
+            
+            <!-- Left Column: Add / Edit Sub-shortcut Studio -->
+            <div class="admin-card-box studio-box">
+              <div class="box-header-row">
+                <div class="flex items-center gap-2">
+                  <span class="studio-icon-badge">⚡</span>
+                  <div>
+                    <h3 class="admin-box-title" id="subshortcut-form-title">Criar Novo Sub-atalho</h3>
+                    <p class="admin-box-sub">Adiciona um item ao menu líquido de um Super Ícone.</p>
+                  </div>
+                </div>
+                <button type="button" id="btn-cancel-edit-subshortcut" class="btn-cancel-edit" style="display: none;">
+                  ✕ Cancelar
+                </button>
+              </div>
+
+              <form id="form-add-subshortcut" class="admin-form-stacked">
+                <div class="admin-form-scrollable">
+                  <div class="form-group">
+                    <label class="setting-label">Super Ícone Pai (Menu Suspenso)</label>
+                    <select id="subshortcut-parent-select" class="admin-select">
+                      <option value="google">🔴 Google Smart Shortcuts</option>
+                      <option value="youtube">▶️ YouTube Smart Shortcuts</option>
+                      <option value="sphere">🔮 Central Sphere 3D</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="setting-label">Nome do Sub-atalho</label>
+                    <input type="text" id="subshortcut-name-input" class="admin-input" required placeholder="Ex: Meu Canal, Agenda, Docs, Notícias...">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="setting-label">URL de Destino</label>
+                    <input type="url" id="subshortcut-url-input" class="admin-input" required placeholder="https://exemplo.com">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="setting-label">Emoji / Ícone Visual (Opcional)</label>
+                    <input type="text" id="subshortcut-icon-input" class="admin-input" placeholder="🚀, 📌, 🎬, 💡...">
+                  </div>
+                </div>
+
+                <div class="admin-form-sticky-footer">
+                  <button type="submit" id="btn-submit-subshortcut" class="admin-btn-primary-action">
+                    <span>⚡ Adicionar Sub-atalho no Supabase</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Right Column: Sub-shortcuts List -->
+            <div class="admin-card-box list-box">
+              <div class="list-header-flex">
+                <div>
+                  <h3 class="admin-box-title">📋 Sub-atalhos Registrados</h3>
+                  <span class="admin-box-sub">Filtre pelo Super Ícone ou pesquise</span>
+                </div>
+                <div class="list-search-wrapper">
+                  <input type="text" id="admin-search-subshortcuts" class="admin-search-input" placeholder="🔍 Buscar sub-atalhos...">
+                </div>
+              </div>
+
+              <!-- Apple Segmented Control Bar -->
+              <div id="subshortcuts-segmented-bar" class="apple-segmented-bar">
+                <button type="button" class="apple-pill active" data-parent="google">🔴 Google <span class="pill-badge" id="badge-count-google">0</span></button>
+                <button type="button" class="apple-pill" data-parent="youtube">▶️ YouTube <span class="pill-badge" id="badge-count-youtube">0</span></button>
+                <button type="button" class="apple-pill" data-parent="sphere">🔮 Sphere 3D <span class="pill-badge" id="badge-count-sphere">0</span></button>
+              </div>
+
+              <div id="admin-subshortcuts-list" class="admin-scroll-list apple-list-container">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Tab 3: Custom Backgrounds Management & Supabase Upload -->
+        <div id="tab-bg-gallery" class="admin-tab-content" style="display: none;">
+          <div class="admin-grid-2col">
+            
+            <!-- Left Column: Upload / Add Video Form -->
+            <div class="admin-card-box studio-box is-collapsed" id="admin-bg-studio-box">
+              <div class="box-header-row" id="bg-upload-header-toggle">
+                <div class="flex items-center gap-2">
+                  <span class="studio-icon-badge">🖼️</span>
+                  <div>
+                    <h3 class="admin-box-title">Upload de Background</h3>
+                    <p class="admin-box-sub">Envie artes/vídeos com qualidade bruta original (sem compressão).</p>
+                  </div>
+                </div>
+                <button type="button" id="btn-toggle-bg-upload" class="btn-toggle-mobile-form" title="Expandir/Recolher Formulário">
+                  <span class="toggle-text">➕ Adicionar</span>
+                </button>
+              </div>
+
+              <form id="form-upload-bg" class="admin-form-stacked">
+                <div class="admin-form-scrollable">
+                  <div class="form-group">
+                    <label class="setting-label">Nome de Identificação</label>
+                    <input type="text" id="custom-bg-name-input" class="admin-input" required placeholder="Ex: Cyberpunk 4K, Neon Waves, Abstract...">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="setting-label">Tipo de Mídia</label>
+                    <select id="custom-bg-type-select" class="admin-select">
+                      <option value="image">🖼️ Imagem (Upload Direto em Resolução Bruta)</option>
+                      <option value="video">🎬 Vídeo Local (MP4, WebM, MOV)</option>
+                      <option value="youtube">▶️ Link de Vídeo do YouTube / Web API</option>
+                    </select>
+                  </div>
+
+                  <!-- Input para Arquivo Local -->
+                  <div class="form-group" id="group-file-upload">
+                    <label class="setting-label">Selecione o Arquivo Original</label>
+                    <input type="file" id="custom-bg-file-input" class="admin-input-file" accept="image/*,video/*">
+                  </div>
+
+                  <!-- Input para URL do YouTube / Web -->
+                  <div class="form-group" id="group-url-upload" style="display: none;">
+                    <label class="setting-label">Link do Vídeo (URL YouTube ou MP4 Web)</label>
+                    <input type="url" id="custom-bg-url-input" class="admin-input" placeholder="https://www.youtube.com/watch?v=... ou https://...mp4">
+                  </div>
+                </div>
+
+                <div class="admin-form-sticky-footer">
+                  <button type="submit" class="admin-btn-primary-action">
+                    <span>🚀 Salvar Background no Supabase</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Right Column: Custom Backgrounds Gallery -->
+            <div class="admin-card-box list-box">
+              <div class="list-header-flex">
+                <div>
+                  <h3 class="admin-box-title">✨ Acervo de Wallpapers</h3>
+                  <span class="admin-box-sub">Seus wallpapers customizados salvos no Supabase Storage</span>
+                </div>
+              </div>
+
+              <div id="custom-bg-gallery-grid" class="bg-gallery-grid custom-gallery-scroll-area">
+                <!-- Dynamically populated from Supabase -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Custom Apple Liquid Glass Dialog Modal -->
+  <div id="custom-dialog-modal" class="glass-dialog-container">
+    <div class="glass-dialog-backdrop" id="dialog-backdrop"></div>
+    <div class="glass-dialog-card">
+      <div class="glass-dialog-icon" id="dialog-icon">⚠️</div>
+      <h3 class="glass-dialog-title" id="dialog-title">Confirmação</h3>
+      <p class="glass-dialog-message" id="dialog-message">Tem certeza que deseja realizar esta ação?</p>
+      <div class="glass-dialog-actions" id="dialog-actions">
+        <button type="button" class="glass-dialog-btn glass-btn-cancel" id="dialog-cancel-btn">Cancelar</button>
+        <button type="button" class="glass-dialog-btn glass-btn-confirm" id="dialog-confirm-btn">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/webgl-backgrounds.js?v=20260826a"></script>
+  <script src="js/media-cache-manager.js?v=20260826a"></script>
+  <script src="js/media-compressor.js?v=20260826a"></script>
+  <script src="js/app.js?v=20260826a"></script>
+</body>
+</html>
